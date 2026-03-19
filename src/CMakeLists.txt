@@ -12,6 +12,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 add_subdirectory(core)
 add_subdirectory(view)
+add_subdirectory(test)
 
 add_executable(Main main.cpp)
 
@@ -20,11 +21,28 @@ target_link_libraries(Main
         Qt6::Widgets
         core
         view
+        test
 )
+
+find_package(GTest REQUIRED)
 
 target_include_directories(Main
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/core
         ${CMAKE_CURRENT_SOURCE_DIR}/view
+        ${CMAKE_CURRENT_SOURCE_DIR}/test
+)
+
+
+add_executable(run_test run_tests.cpp)
+
+target_include_directories(run_test
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/core
+        ${CMAKE_CURRENT_SOURCE_DIR}/view
+        ${CMAKE_CURRENT_SOURCE_DIR}/test
+)
+target_link_libraries(run_test PUBLIC core view Qt6::Widgets  GTest::gtest GTest::gtest_main
 )
