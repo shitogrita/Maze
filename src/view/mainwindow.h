@@ -1,8 +1,14 @@
 #pragma once
 
+#include <QLabel>
 #include <QMainWindow>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QWidget>
+#include <QGridLayout>
 
-#include "maze.h"
+#include "../core/maze.h"
+#include "mazeview.h"
 
 class QSpinBox;
 class QPushButton;
@@ -12,15 +18,16 @@ class MazeView;
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 
-   public:
+  public:
 	explicit MainWindow(QWidget* parent = nullptr);
 
-private slots:
- void OnGenerateClicked();
+  private slots:
+	void OnGenerateClicked();
 	void OnImportClicked();
 	void OnExportClicked();
+	void OnSolveClicked();
 
-private:
+  private:
 	void SetupUi();
 	void ApplyStyle();
 
@@ -35,7 +42,13 @@ private:
 	QPushButton* generate_button_ = nullptr;
 	QPushButton* import_button_ = nullptr;
 	QPushButton* export_button_ = nullptr;
+	QPushButton* solve_button_ = nullptr;
 
 	QLabel* title_label_ = nullptr;
 	QLabel* info_label_ = nullptr;
+
+	QSpinBox* start_row_spin_ = nullptr;
+	QSpinBox* start_col_spin_ = nullptr;
+	QSpinBox* finish_row_spin_ = nullptr;
+	QSpinBox* finish_col_spin_ = nullptr;
 };

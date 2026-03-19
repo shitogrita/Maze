@@ -1,6 +1,7 @@
 add_library(core STATIC
         maze.cpp
         maze.h
+
 )
 
 target_include_directories(core
