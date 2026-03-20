@@ -6,7 +6,7 @@ BUILD_DIR ?= build
 COV_BUILD ?= build-coverage
 
 # CMake targets
-APP_TARGET  ?= maze
+APP_TARGET  ?= Main
 TEST_TARGET ?= run_test
 
 # Install locations

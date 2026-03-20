@@ -4,6 +4,9 @@
 #include <queue>
 #include <utility>
 #include <vector>
+#include <cstdio>
+#include <fstream>
+#include <string>
 
 #include "../core/maze.h"
 
@@ -158,4 +161,138 @@ TEST(MazeGenerator, LargeMazeGenerationWorks) {
 	  EXPECT_EQ(maze.GetRows(), 50);
 	  EXPECT_EQ(maze.GetCols(), 50);
 	  EXPECT_EQ(CountReachableCells(maze, 0, 0), 2500);
+}
+
+TEST(MazeGenerator, NewMazeIsEmpty) {
+    s21::Maze maze;
+    EXPECT_TRUE(maze.IsEmpty());
+}
+
+TEST(MazeGenerator, GeneratedMazeIsNotEmpty) {
+    s21::Maze maze;
+    maze.GenerateMaze(3, 3);
+    EXPECT_FALSE(maze.IsEmpty());
+}
+
+TEST(MazeGenerator, SaveToFileReturnsTrueForGeneratedMaze) {
+    s21::Maze maze;
+    maze.GenerateMaze(4, 4);
+
+    const std::string filename = "maze_generator_save_test.txt";
+    EXPECT_TRUE(maze.SaveToFile(filename));
+
+    std::remove(filename.c_str());
+}
+
+TEST(MazeGenerator, LoadFromFilePreservesDimensions) {
+    s21::Maze maze;
+    maze.GenerateMaze(7, 9);
+
+    const std::string filename = "maze_generator_load_dims.txt";
+    ASSERT_TRUE(maze.SaveToFile(filename));
+
+    s21::Maze loaded;
+    ASSERT_TRUE(loaded.LoadFromFile(filename));
+
+    EXPECT_EQ(loaded.GetRows(), 7);
+    EXPECT_EQ(loaded.GetCols(), 9);
+
+    std::remove(filename.c_str());
+}
+
+TEST(MazeGenerator, LoadFromFilePreservesWalls) {
+    s21::Maze maze;
+    maze.GenerateMaze(5, 5);
+
+    const std::string filename = "maze_generator_load_walls.txt";
+    ASSERT_TRUE(maze.SaveToFile(filename));
+
+    s21::Maze loaded;
+    ASSERT_TRUE(loaded.LoadFromFile(filename));
+
+    EXPECT_EQ(maze.GetRightWalls(), loaded.GetRightWalls());
+    EXPECT_EQ(maze.GetBottomWalls(), loaded.GetBottomWalls());
+
+    std::remove(filename.c_str());
+}
+
+TEST(MazeGenerator, GenerateOneByManyMaze) {
+    s21::Maze maze;
+    maze.GenerateMaze(1, 5);
+
+    EXPECT_EQ(maze.GetRows(), 1);
+    EXPECT_EQ(maze.GetCols(), 5);
+    ASSERT_EQ(maze.GetRightWalls().size(), 1u);
+    ASSERT_EQ(maze.GetBottomWalls().size(), 1u);
+    EXPECT_EQ(maze.GetRightWalls()[0].size(), 5u);
+    EXPECT_EQ(maze.GetBottomWalls()[0].size(), 5u);
+}
+
+TEST(MazeGenerator, GenerateManyByOneMaze) {
+    s21::Maze maze;
+    maze.GenerateMaze(5, 1);
+
+    EXPECT_EQ(maze.GetRows(), 5);
+    EXPECT_EQ(maze.GetCols(), 1);
+    ASSERT_EQ(maze.GetRightWalls().size(), 5u);
+    ASSERT_EQ(maze.GetBottomWalls().size(), 5u);
+
+    for (size_t i = 0; i < 5; ++i) {
+      EXPECT_EQ(maze.GetRightWalls()[i].size(), 1u);
+      EXPECT_EQ(maze.GetBottomWalls()[i].size(), 1u);
+    }
+}
+
+TEST(MazeGenerator, SingleCellMazeHasNoNeighbours) {
+    s21::Maze maze;
+    maze.GenerateMaze(1, 1);
+
+    auto neighbours = maze.GetNeighbours(0, 0);
+    EXPECT_TRUE(neighbours.empty());
+}
+
+TEST(MazeGenerator, LoadFromFileMakesMazeNotEmpty) {
+    const std::string filename = "maze_generator_manual_load.txt";
+
+    {
+      std::ofstream file(filename);
+      file << "2 2\n";
+      file << "0 1\n";
+      file << "0 1\n";
+      file << "\n";
+      file << "0 0\n";
+      file << "1 1\n";
+    }
+
+    s21::Maze maze;
+    ASSERT_TRUE(maze.LoadFromFile(filename));
+    EXPECT_FALSE(maze.IsEmpty());
+
+    std::remove(filename.c_str());
+}
+
+TEST(MazeGenerator, LoadedMazeIsConnected) {
+    const std::string filename = "maze_generator_connected_load.txt";
+
+    {
+      std::ofstream file(filename);
+      file << "4 4\n";
+      file << "0 0 0 1\n";
+      file << "1 0 1 1\n";
+      file << "0 1 0 1\n";
+      file << "0 0 0 1\n";
+      file << "\n";
+      file << "1 0 1 0\n";
+      file << "0 0 1 0\n";
+      file << "1 1 0 1\n";
+      file << "1 1 1 1\n";
+    }
+
+    s21::Maze maze;
+    ASSERT_TRUE(maze.LoadFromFile(filename));
+
+    int reachable = CountReachableCells(maze, 0, 0);
+    EXPECT_EQ(reachable, maze.GetRows() * maze.GetCols());
+
+    std::remove(filename.c_str());
 }
