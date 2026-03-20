@@ -129,21 +129,22 @@ uninstall:
 	@rm -f "$(INSTALL_DIR)/$(INSTALL_APP_NAME)" "$(INSTALL_DIR)/$(INSTALL_TEST_NAME)" 2>/dev/null || true
 
 clean:
-	@rm -rf "$(BUILD_DIR)" "$(COV_BUILD)" docs "$(DIST_DIR)" cmake-*
+	@rm -rf "$(BUILD_DIR)" "$(COV_BUILD)" docs "$(DIST_DIR)"
 
 dvi:
 	@set -e; \
 	if ! command -v "$(DOXYGEN)" >/dev/null 2>&1; then exit 1; fi; \
 	if [ ! -f "$(DOXYFILE)" ]; then \
 		"$(DOXYGEN)" -g "$(DOXYFILE)" >/dev/null; \
-		$(SED_INPLACE) 's|^PROJECT_NAME.*|PROJECT_NAME = "3DViewer_v2.0"|' "$(DOXYFILE)"; \
-		$(SED_INPLACE) 's|^OUTPUT_DIRECTORY.*|OUTPUT_DIRECTORY = $(DOC_OUT)|' "$(DOXYFILE)"; \
-		$(SED_INPLACE) 's|^INPUT .*|INPUT = core parser render view resources test run_program.cpp run_tests.cpp|' "$(DOXYFILE)"; \
-		$(SED_INPLACE) 's|^RECURSIVE.*|RECURSIVE = YES|' "$(DOXYFILE)"; \
-		$(SED_INPLACE) 's|^EXTRACT_ALL.*|EXTRACT_ALL = YES|' "$(DOXYFILE)"; \
-		$(SED_INPLACE) 's|^GENERATE_HTML.*|GENERATE_HTML = YES|' "$(DOXYFILE)"; \
-		$(SED_INPLACE) 's|^GENERATE_LATEX.*|GENERATE_LATEX = NO|' "$(DOXYFILE)"; \
-		$(SED_INPLACE) 's|^QUIET.*|QUIET = YES|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^PROJECT_NAME.*|PROJECT_NAME = "Maze"|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^OUTPUT_DIRECTORY.*|OUTPUT_DIRECTORY = $(DOC_OUT)|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^INPUT .*|INPUT = core view ml web test main.cpp run_tests.cpp|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^RECURSIVE.*|RECURSIVE = YES|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^EXTRACT_ALL.*|EXTRACT_ALL = YES|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^GENERATE_HTML.*|GENERATE_HTML = YES|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^GENERATE_LATEX.*|GENERATE_LATEX = NO|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^USE_PDFLATEX.*|USE_PDFLATEX = NO|' "$(DOXYFILE)"; \
+	$(SED_INPLACE) 's|^QUIET.*|QUIET = YES|' "$(DOXYFILE)"; \
 	fi; \
 	mkdir -p "$(DOC_OUT)"; \
 	"$(DOXYGEN)" "$(DOXYFILE)" >/dev/null; \

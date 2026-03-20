@@ -7,20 +7,39 @@
 
 #include "../core/maze.h"
 
+/**
+ * @brief Виджет для отображения лабиринта и пути.
+ */
 class MazeView : public QWidget {
 	Q_OBJECT
 
    public:
+	/**
+	 * @brief Конструктор виджета.
+	 */
 	explicit MazeView(QWidget* parent = nullptr);
 
+	/**
+	 * @brief Устанавливает лабиринт для отображения.
+	 */
 	void SetMaze(const s21::Maze& maze);
+
+	/**
+	 * @brief Устанавливает путь для отображения.
+	 */
 	void SetPath(const std::vector<std::pair<int, int>>& path);
 
 protected:
+	/**
+	 * @brief Отрисовывает лабиринт и путь.
+	 */
 	void paintEvent(QPaintEvent* event) override;
 
 private slots:
- void OnPathAnimationStep();
+	/**
+	 * @brief Выполняет следующий шаг анимации пути.
+	 */
+	void OnPathAnimationStep();
 
 private:
 	s21::Maze maze_;

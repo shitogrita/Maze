@@ -22,20 +22,20 @@ namespace s21 {
 		bottom_walls_.assign(rows_, std::vector<int>(cols_, 0));
 	}
 
-	void Maze::PrintLine(const std::vector<int> &maze) const {
-		// old
-		for (const auto &elem: maze) {
-			std::cout << elem << " ";
-		}
-	}
-
-	void Maze::PrintMatrixRow(const std::vector<std::vector<int> > &matrix, //old
-							int row) const {
-		for (int j = 0; j < static_cast<int>(matrix[row].size()); ++j) {
-			std::cout << matrix[row][j] << " ";
-		}
-		std::cout << std::endl;
-	}
+	// void Maze::PrintLine(const std::vector<int> &maze) const {
+	// 	// old
+	// 	for (const auto &elem: maze) {
+	// 		std::cout << elem << " ";
+	// 	}
+	// }
+	//
+	// void Maze::PrintMatrixRow(const std::vector<std::vector<int> > &matrix, //old
+	// 						int row) const {
+	// 	for (int j = 0; j < static_cast<int>(matrix[row].size()); ++j) {
+	// 		std::cout << matrix[row][j] << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
 
 	bool Maze::Random() {
 		static std::random_device rd;

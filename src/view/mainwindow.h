@@ -8,36 +8,132 @@
 #include <QTimer>
 #include <QWidget>
 
+#include "MazeQSolver.h"
 #include "cave.h"
 #include "caveview.h"
 #include "maze.h"
 #include "mazeview.h"
-#include "MazeQSolver.h"
 
+/**
+ * @brief Главное окно приложения.
+ *
+ * Содержит вкладки для работы с лабиринтом, пещерой
+ * и обучением агента на основе Q-learning.
+ */
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
  public:
+  /**
+   * @brief Конструктор главного окна.
+   */
   explicit MainWindow(QWidget* parent = nullptr);
 
  private slots:
+  /**
+   * @brief Генерирует новый лабиринт.
+   */
   void OnGenerateClicked();
+
+  /**
+   * @brief Загружает лабиринт из файла.
+   */
   void OnImportClicked();
+
+  /**
+   * @brief Сохраняет лабиринт в файл.
+   */
   void OnExportClicked();
+
+  /**
+   * @brief Ищет путь в лабиринте.
+   */
   void OnSolveClicked();
 
+  /**
+   * @brief Генерирует новую пещеру.
+   */
   void OnCaveGenerateClicked();
+
+  /**
+   * @brief Загружает пещеру из файла.
+   */
   void OnCaveImportClicked();
+
+  /**
+   * @brief Сохраняет пещеру в файл.
+   */
   void OnCaveExportClicked();
+
+  /**
+   * @brief Выполняет один шаг эволюции пещеры.
+   */
   void OnCaveStepClicked();
+
+  /**
+   * @brief Запускает автоматическое обновление пещеры.
+   */
   void OnCaveAutoClicked();
+
+  /**
+   * @brief Останавливает автоматическое обновление пещеры.
+   */
   void OnCaveStopClicked();
+
+  /**
+   * @brief Обрабатывает событие таймера пещеры.
+   */
   void OnCaveTimerTimeout();
 
+  /**
+   * @brief Загружает лабиринт для Q-learning.
+   */
+  void OnQImportClicked();
+
+  /**
+   * @brief Запускает обучение агента.
+   */
+  void OnQTrainClicked();
+
+  /**
+   * @brief Строит маршрут обученным агентом.
+   */
+  void OnQRunClicked();
+
+  /**
+   * @brief Останавливает обучение агента.
+   */
+  void OnQStopClicked();
+
+  /**
+   * @brief Обрабатывает шаг анимации обучения агента.
+   */
+  void OnQTrainingTimerTimeout();
+
  private:
+  /**
+   * @brief Создаёт основной интерфейс окна.
+   */
   void SetupUi();
+
+  /**
+   * @brief Создаёт вкладку лабиринта.
+   */
   void SetupMazeTab();
+
+  /**
+   * @brief Создаёт вкладку пещеры.
+   */
   void SetupCaveTab();
+
+  /**
+   * @brief Создаёт вкладку Q-learning.
+   */
+  void SetupQTab();
+
+  /**
+   * @brief Применяет стиль интерфейса.
+   */
   void ApplyStyle();
 
  private:
@@ -83,45 +179,33 @@ class MainWindow : public QMainWindow {
   QSpinBox* cave_death_spin_ = nullptr;
   QSpinBox* cave_interval_spin_ = nullptr;
 
+  QWidget* q_tab_ = nullptr;
+  MazeView* q_maze_view_ = nullptr;
+  s21::Maze rl_maze_;
+  s21::MazeQSolver q_solver_;
+  QTimer* q_training_timer_ = nullptr;
 
-private slots:
- void OnQImportClicked();
- void OnQTrainClicked();
- void OnQRunClicked();
- void OnQStopClicked();
- void OnQTrainingTimerTimeout();
+  QPushButton* q_import_button_ = nullptr;
+  QPushButton* q_train_button_ = nullptr;
+  QPushButton* q_run_button_ = nullptr;
+  QPushButton* q_stop_button_ = nullptr;
 
-private:
- void SetupQTab();
+  QLabel* q_info_label_ = nullptr;
 
- QWidget* q_tab_ = nullptr;
- MazeView* q_maze_view_ = nullptr;
- s21::Maze rl_maze_;
- s21::MazeQSolver q_solver_;
- QTimer* q_training_timer_ = nullptr;
+  QSpinBox* q_goal_row_spin_ = nullptr;
+  QSpinBox* q_goal_col_spin_ = nullptr;
 
- QPushButton* q_import_button_ = nullptr;
- QPushButton* q_train_button_ = nullptr;
- QPushButton* q_run_button_ = nullptr;
- QPushButton* q_stop_button_ = nullptr;
+  QSpinBox* q_start_row_spin_ = nullptr;
+  QSpinBox* q_start_col_spin_ = nullptr;
 
- QLabel* q_info_label_ = nullptr;
+  QSpinBox* q_epochs_per_tick_spin_ = nullptr;
+  QSpinBox* q_timer_interval_spin_ = nullptr;
+  QSpinBox* q_total_epochs_spin_ = nullptr;
 
- QSpinBox* q_goal_row_spin_ = nullptr;
- QSpinBox* q_goal_col_spin_ = nullptr;
+  int q_epochs_done_ = 0;
+  int q_total_epochs_target_ = 0;
 
- QSpinBox* q_start_row_spin_ = nullptr;
- QSpinBox* q_start_col_spin_ = nullptr;
-
- QSpinBox* q_epochs_per_tick_spin_ = nullptr;
- QSpinBox* q_timer_interval_spin_ = nullptr;
-
- QSpinBox* q_total_epochs_spin_ = nullptr;
-
- int q_epochs_done_ = 0;
- int q_total_epochs_target_ = 0;
-
- double q_alpha_ = 0.1;
- double q_gamma_ = 0.9;
- double q_epsilon_ = 0.2;
+  double q_alpha_ = 0.1;
+  double q_gamma_ = 0.9;
+  double q_epsilon_ = 0.2;
 };
