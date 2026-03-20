@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QTabWidget>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -18,14 +19,29 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
 void MainWindow::SetupUi() {
   setWindowTitle("Maze");
-  setFixedSize(860, 560);
+  setFixedSize(900, 620);
 
   central_widget_ = new QWidget(this);
   setCentralWidget(central_widget_);
 
-  auto* main_layout = new QHBoxLayout(central_widget_);
-  main_layout->setContentsMargins(20, 20, 20, 20);
-  main_layout->setSpacing(20);
+  auto* root_layout = new QVBoxLayout(central_widget_);
+  root_layout->setContentsMargins(12, 12, 12, 12);
+  root_layout->setSpacing(8);
+
+  tab_widget_ = new QTabWidget(this);
+  root_layout->addWidget(tab_widget_);
+
+  SetupMazeTab();
+  SetupCaveTab();
+}
+
+void MainWindow::SetupMazeTab() {
+  maze_tab_ = new QWidget(this);
+  tab_widget_->addTab(maze_tab_, "Maze");
+
+  auto* main_layout = new QHBoxLayout(maze_tab_);
+  main_layout->setContentsMargins(16, 16, 16, 16);
+  main_layout->setSpacing(16);
 
   maze_view_ = new MazeView(this);
   main_layout->addWidget(maze_view_, 0, Qt::AlignLeft | Qt::AlignTop);
@@ -39,7 +55,7 @@ void MainWindow::SetupUi() {
 
   title_label_ = new QLabel("MAZE CONTROL", this);
   title_label_->setAlignment(Qt::AlignCenter);
-  title_label_->setFixedHeight(20);
+  title_label_->setFixedHeight(22);
   side_layout->addWidget(title_label_);
 
   import_button_ = new QPushButton("IMPORT", this);
@@ -78,7 +94,6 @@ void MainWindow::SetupUi() {
   side_layout->addWidget(rows_spin_);
   side_layout->addWidget(cols_label);
   side_layout->addWidget(cols_spin_);
-
   side_layout->addWidget(generate_button_);
 
   auto* solve_title = new QLabel("PATHFINDING SETTINGS", this);
@@ -151,6 +166,160 @@ void MainWindow::SetupUi() {
           this, &MainWindow::OnSolveClicked);
 }
 
+void MainWindow::SetupCaveTab() {
+  cave_tab_ = new QWidget(this);
+  tab_widget_->addTab(cave_tab_, "Cave");
+
+  auto* main_layout = new QHBoxLayout(cave_tab_);
+  main_layout->setContentsMargins(16, 16, 16, 16);
+  main_layout->setSpacing(16);
+
+  cave_timer_ = new QTimer(this);
+  connect(cave_timer_, &QTimer::timeout,
+          this, &MainWindow::OnCaveTimerTimeout);
+
+  cave_view_ = new CaveView(this);
+  main_layout->addWidget(cave_view_, 0, Qt::AlignLeft | Qt::AlignTop);
+
+  auto* side_panel = new QFrame(this);
+  side_panel->setFixedWidth(280);
+
+  auto* side_layout = new QVBoxLayout(side_panel);
+  side_layout->setContentsMargins(10, 10, 10, 10);
+  side_layout->setSpacing(6);
+
+  auto* title = new QLabel("CAVE CONTROL", this);
+  title->setAlignment(Qt::AlignCenter);
+  title->setFixedHeight(18);
+  side_layout->addWidget(title);
+
+  cave_import_button_ = new QPushButton("IMPORT", this);
+  cave_export_button_ = new QPushButton("EXPORT", this);
+  cave_generate_button_ = new QPushButton("GENERATE", this);
+  cave_step_button_ = new QPushButton("NEXT STEP", this);
+  cave_auto_button_ = new QPushButton("AUTO RUN", this);
+  cave_stop_button_ = new QPushButton("STOP", this);
+
+  cave_import_button_->setFixedHeight(28);
+  cave_export_button_->setFixedHeight(28);
+  cave_generate_button_->setFixedHeight(28);
+  cave_step_button_->setFixedHeight(28);
+  cave_auto_button_->setFixedHeight(28);
+  cave_stop_button_->setFixedHeight(28);
+
+  auto* import_export_layout = new QHBoxLayout();
+  import_export_layout->setSpacing(6);
+  import_export_layout->addWidget(cave_import_button_);
+  import_export_layout->addWidget(cave_export_button_);
+  side_layout->addLayout(import_export_layout);
+
+  auto* generation_title = new QLabel("CAVE GENERATION SETTINGS", this);
+  generation_title->setAlignment(Qt::AlignCenter);
+  generation_title->setFixedHeight(16);
+  side_layout->addWidget(generation_title);
+
+  auto* size_frame = new QFrame(this);
+  auto* size_layout = new QGridLayout(size_frame);
+  size_layout->setContentsMargins(6, 6, 6, 6);
+  size_layout->setHorizontalSpacing(6);
+  size_layout->setVerticalSpacing(4);
+
+  auto* rows_label = new QLabel("ROWS", size_frame);
+  rows_label->setFixedHeight(16);
+  cave_rows_spin_ = new QSpinBox(size_frame);
+  cave_rows_spin_->setRange(1, 50);
+  cave_rows_spin_->setValue(20);
+  cave_rows_spin_->setFixedHeight(24);
+
+  auto* cols_label = new QLabel("COLS", size_frame);
+  cols_label->setFixedHeight(16);
+  cave_cols_spin_ = new QSpinBox(size_frame);
+  cave_cols_spin_->setRange(1, 50);
+  cave_cols_spin_->setValue(20);
+  cave_cols_spin_->setFixedHeight(24);
+
+  size_layout->addWidget(rows_label, 0, 0);
+  size_layout->addWidget(cols_label, 0, 1);
+  size_layout->addWidget(cave_rows_spin_, 1, 0);
+  size_layout->addWidget(cave_cols_spin_, 1, 1);
+
+  side_layout->addWidget(size_frame);
+
+  auto* chance_label = new QLabel("INITIAL CHANCE %", this);
+  chance_label->setFixedHeight(16);
+  cave_chance_spin_ = new QSpinBox(this);
+  cave_chance_spin_->setRange(0, 100);
+  cave_chance_spin_->setValue(45);
+  cave_chance_spin_->setFixedHeight(24);
+
+  side_layout->addWidget(chance_label);
+  side_layout->addWidget(cave_chance_spin_);
+  side_layout->addWidget(cave_generate_button_);
+
+  auto* automata_title = new QLabel("CELLULAR AUTOMATON SETTINGS", this);
+  automata_title->setAlignment(Qt::AlignCenter);
+  automata_title->setFixedHeight(16);
+  side_layout->addWidget(automata_title);
+
+  auto* limits_frame = new QFrame(this);
+  auto* limits_layout = new QGridLayout(limits_frame);
+  limits_layout->setContentsMargins(6, 6, 6, 6);
+  limits_layout->setHorizontalSpacing(6);
+  limits_layout->setVerticalSpacing(4);
+
+  auto* birth_label = new QLabel("BIRTH", limits_frame);
+  birth_label->setFixedHeight(16);
+  cave_birth_spin_ = new QSpinBox(limits_frame);
+  cave_birth_spin_->setRange(0, 7);
+  cave_birth_spin_->setValue(4);
+  cave_birth_spin_->setFixedHeight(24);
+
+  auto* death_label = new QLabel("DEATH", limits_frame);
+  death_label->setFixedHeight(16);
+  cave_death_spin_ = new QSpinBox(limits_frame);
+  cave_death_spin_->setRange(0, 7);
+  cave_death_spin_->setValue(3);
+  cave_death_spin_->setFixedHeight(24);
+
+  limits_layout->addWidget(birth_label, 0, 0);
+  limits_layout->addWidget(death_label, 0, 1);
+  limits_layout->addWidget(cave_birth_spin_, 1, 0);
+  limits_layout->addWidget(cave_death_spin_, 1, 1);
+
+  side_layout->addWidget(limits_frame);
+
+  auto* interval_label = new QLabel("AUTO STEP MS", this);
+  interval_label->setFixedHeight(16);
+  cave_interval_spin_ = new QSpinBox(this);
+  cave_interval_spin_->setRange(1, 5000);
+  cave_interval_spin_->setValue(210);
+  cave_interval_spin_->setFixedHeight(24);
+
+  side_layout->addWidget(interval_label);
+  side_layout->addWidget(cave_interval_spin_);
+
+  side_layout->addWidget(cave_step_button_);
+  side_layout->addWidget(cave_auto_button_);
+  side_layout->addWidget(cave_stop_button_);
+
+  side_layout->addStretch();
+
+  main_layout->addWidget(side_panel, 0, Qt::AlignTop);
+
+  connect(cave_generate_button_, &QPushButton::clicked,
+          this, &MainWindow::OnCaveGenerateClicked);
+  connect(cave_import_button_, &QPushButton::clicked,
+          this, &MainWindow::OnCaveImportClicked);
+  connect(cave_export_button_, &QPushButton::clicked,
+          this, &MainWindow::OnCaveExportClicked);
+  connect(cave_step_button_, &QPushButton::clicked,
+          this, &MainWindow::OnCaveStepClicked);
+  connect(cave_auto_button_, &QPushButton::clicked,
+          this, &MainWindow::OnCaveAutoClicked);
+  connect(cave_stop_button_, &QPushButton::clicked,
+          this, &MainWindow::OnCaveStopClicked);
+}
+
 void MainWindow::ApplyStyle() {
   setStyleSheet(R"(
     QMainWindow, QWidget {
@@ -158,6 +327,24 @@ void MainWindow::ApplyStyle() {
       color: #d8e1f0;
       font-family: Consolas, 'Courier New', monospace;
       font-size: 12px;
+    }
+
+    QTabWidget::pane {
+      border: 1px solid #4b5568;
+      background-color: #2a2c33;
+    }
+
+    QTabBar::tab {
+      background-color: #1f2530;
+      color: #78a6ff;
+      border: 1px solid #4f78c7;
+      padding: 5px 12px;
+      min-width: 80px;
+    }
+
+    QTabBar::tab:selected {
+      background-color: #263041;
+      color: #9cc0ff;
     }
 
     QFrame {
@@ -291,7 +478,7 @@ void MainWindow::OnSolveClicked() {
         "Координаты старта или финиша выходят за границы лабиринта.");
     maze_view_->SetPath({});
     return;
-      }
+  }
 
   auto path = maze_.Bfs({start_row, start_col}, {finish_row, finish_col});
 
@@ -302,4 +489,95 @@ void MainWindow::OnSolveClicked() {
   }
 
   maze_view_->SetPath(path);
+}
+
+void MainWindow::OnCaveGenerateClicked() {
+  int rows = cave_rows_spin_->value();
+  int cols = cave_cols_spin_->value();
+  int chance = cave_chance_spin_->value();
+
+  cave_.GenerateCave(rows, cols, chance);
+  cave_.SetLimits(cave_birth_spin_->value(), cave_death_spin_->value());
+  cave_view_->SetCave(cave_);
+}
+
+void MainWindow::OnCaveImportClicked() {
+  QString path = QFileDialog::getOpenFileName(
+      this, "Open cave file", "", "Text files (*.txt);;All files (*)");
+
+  if (path.isEmpty()) {
+    return;
+  }
+
+  if (!cave_.LoadFromFile(path.toStdString())) {
+    QMessageBox::warning(this, "Ошибка",
+                         "Не удалось загрузить пещеру из файла.");
+    return;
+  }
+
+  cave_rows_spin_->setValue(cave_.GetRows());
+  cave_cols_spin_->setValue(cave_.GetCols());
+  cave_view_->SetCave(cave_);
+}
+
+void MainWindow::OnCaveExportClicked() {
+  if (cave_.IsEmpty()) {
+    QMessageBox::information(this, "Информация",
+                             "Сначала сгенерируйте или загрузите пещеру.");
+    return;
+  }
+
+  QString path = QFileDialog::getSaveFileName(
+      this, "Save cave file", "", "Text files (*.txt);;All files (*)");
+
+  if (path.isEmpty()) {
+    return;
+  }
+
+  if (!cave_.SaveToFile(path.toStdString())) {
+    QMessageBox::warning(this, "Ошибка",
+                         "Не удалось сохранить пещеру в файл.");
+  }
+}
+
+void MainWindow::OnCaveStepClicked() {
+  if (cave_.IsEmpty()) {
+    QMessageBox::information(this, "Информация",
+                             "Сначала сгенерируйте или загрузите пещеру.");
+    return;
+  }
+
+  cave_.SetLimits(cave_birth_spin_->value(), cave_death_spin_->value());
+  cave_.Step();
+  cave_view_->SetCave(cave_);
+}
+
+void MainWindow::OnCaveAutoClicked() {
+  if (cave_.IsEmpty()) {
+    QMessageBox::information(this, "Информация",
+                             "Сначала сгенерируйте или загрузите пещеру.");
+    return;
+  }
+
+  cave_.SetLimits(cave_birth_spin_->value(), cave_death_spin_->value());
+
+  int interval_ms = cave_interval_spin_->value();
+  cave_timer_->stop();
+  cave_timer_->setInterval(interval_ms);
+  cave_timer_->start();
+}
+
+void MainWindow::OnCaveStopClicked() {
+  cave_timer_->stop();
+}
+
+void MainWindow::OnCaveTimerTimeout() {
+  if (cave_.IsEmpty()) {
+    cave_timer_->stop();
+    return;
+  }
+
+  cave_.SetLimits(cave_birth_spin_->value(), cave_death_spin_->value());
+  cave_.Step();
+  cave_view_->SetCave(cave_);
 }

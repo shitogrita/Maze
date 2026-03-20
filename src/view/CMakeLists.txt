@@ -3,6 +3,9 @@ add_library(view STATIC
         mainwindow.h
         mazeview.cpp
         mazeview.h
+        caveview.cpp
+        caveview.h
+
 )
 
 target_link_libraries(view
