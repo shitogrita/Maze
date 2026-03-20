@@ -150,4 +150,17 @@ namespace s21 {
 
 		return true;
 	}
+
+	void Cave::SetCellsForTests(const std::vector<std::vector<int>>& cells) {
+		if (cells.empty() || cells[0].empty()) {
+			rows_ = 0;
+			cols_ = 0;
+			cells_.clear();
+			return;
+		}
+
+		rows_ = static_cast<int>(cells.size());
+		cols_ = static_cast<int>(cells[0].size());
+		cells_ = cells;
+	}
 }

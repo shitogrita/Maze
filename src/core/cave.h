@@ -24,6 +24,7 @@ namespace s21 {
 
 		void SetLimits(int birth_limit, int death_limit);
 
+		void SetCellsForTests(const std::vector<std::vector<int>>& cells);
 
 	  private:
 		int rows_ = 0;
