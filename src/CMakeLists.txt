@@ -13,6 +13,8 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 add_subdirectory(core)
 add_subdirectory(view)
 add_subdirectory(test)
+add_subdirectory(ml)
+
 add_subdirectory(web)
 
 add_executable(Main main.cpp)

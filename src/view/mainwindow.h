@@ -12,6 +12,7 @@
 #include "caveview.h"
 #include "maze.h"
 #include "mazeview.h"
+#include "MazeQSolver.h"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -81,4 +82,46 @@ class MainWindow : public QMainWindow {
   QSpinBox* cave_birth_spin_ = nullptr;
   QSpinBox* cave_death_spin_ = nullptr;
   QSpinBox* cave_interval_spin_ = nullptr;
+
+
+private slots:
+ void OnQImportClicked();
+ void OnQTrainClicked();
+ void OnQRunClicked();
+ void OnQStopClicked();
+ void OnQTrainingTimerTimeout();
+
+private:
+ void SetupQTab();
+
+ QWidget* q_tab_ = nullptr;
+ MazeView* q_maze_view_ = nullptr;
+ s21::Maze rl_maze_;
+ s21::MazeQSolver q_solver_;
+ QTimer* q_training_timer_ = nullptr;
+
+ QPushButton* q_import_button_ = nullptr;
+ QPushButton* q_train_button_ = nullptr;
+ QPushButton* q_run_button_ = nullptr;
+ QPushButton* q_stop_button_ = nullptr;
+
+ QLabel* q_info_label_ = nullptr;
+
+ QSpinBox* q_goal_row_spin_ = nullptr;
+ QSpinBox* q_goal_col_spin_ = nullptr;
+
+ QSpinBox* q_start_row_spin_ = nullptr;
+ QSpinBox* q_start_col_spin_ = nullptr;
+
+ QSpinBox* q_epochs_per_tick_spin_ = nullptr;
+ QSpinBox* q_timer_interval_spin_ = nullptr;
+
+ QSpinBox* q_total_epochs_spin_ = nullptr;
+
+ int q_epochs_done_ = 0;
+ int q_total_epochs_target_ = 0;
+
+ double q_alpha_ = 0.1;
+ double q_gamma_ = 0.9;
+ double q_epsilon_ = 0.2;
 };
