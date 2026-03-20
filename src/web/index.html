@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Maze and Cave</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            background-color: #2a2c33;
+            color: #d8e1f0;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .canvas-column {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .canvas-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .canvas-title {
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .panel {
+            width: 300px;
+            background-color: #30333b;
+            border: 1px solid #4b5568;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 12px 0 8px 0;
+            color: #d8e1f0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            color: #d8e1f0;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #23252b;
+            color: #e4ecf7;
+            border: 1px solid #4e607c;
+            padding: 4px 6px;
+            min-height: 28px;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        button {
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #1f2530;
+            color: #78a6ff;
+            border: 1px solid #4f78c7;
+            padding: 6px;
+            font-weight: bold;
+            min-height: 30px;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background-color: #263041;
+            color: #9cc0ff;
+            border: 1px solid #7ea7ff;
+        }
+
+        button:active {
+            background-color: #18202c;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .button-row button {
+            margin-top: 8px;
+        }
+
+        canvas {
+            display: block;
+            width: 500px;
+            height: 500px;
+            background-color: #30333b;
+            border: 1px solid #4b5568;
+        }
+
+        .status {
+            margin-top: 10px;
+            min-height: 18px;
+            color: #d8e1f0;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="canvas-column">
+        <div class="canvas-block">
+            <div class="canvas-title">MAZE</div>
+            <canvas id="maze_canvas" width="500" height="500"></canvas>
+        </div>
+
+        <div class="canvas-block">
+            <div class="canvas-title">CAVE</div>
+            <canvas id="cave_canvas" width="500" height="500"></canvas>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="title">CONTROL PANEL</div>
+
+        <div class="section-title">MAZE GENERATION SETTINGS</div>
+
+        <div class="grid-2">
+            <div>
+                <label for="rows">ROWS</label>
+                <input id="rows" type="number" value="10" min="1" max="50" />
+            </div>
+            <div>
+                <label for="cols">COLS</label>
+                <input id="cols" type="number" value="10" min="1" max="50" />
+            </div>
+        </div>
+
+        <button id="generate_button">GENERATE MAZE</button>
+
+        <div class="section-title">PATHFINDING SETTINGS</div>
+
+        <div class="grid-2">
+            <div>
+                <label for="start_row">START ROW</label>
+                <input id="start_row" type="number" value="0" min="0" max="49" />
+            </div>
+            <div>
+                <label for="start_col">START COL</label>
+                <input id="start_col" type="number" value="0" min="0" max="49" />
+            </div>
+            <div>
+                <label for="finish_row">FINISH ROW</label>
+                <input id="finish_row" type="number" value="9" min="0" max="49" />
+            </div>
+            <div>
+                <label for="finish_col">FINISH COL</label>
+                <input id="finish_col" type="number" value="9" min="0" max="49" />
+            </div>
+        </div>
+
+        <button id="solve_button">SOLVE</button>
+
+        <div class="section-title">CAVE GENERATION SETTINGS</div>
+
+        <div class="grid-2">
+            <div>
+                <label for="cave_rows">ROWS</label>
+                <input id="cave_rows" type="number" value="20" min="1" max="50" />
+            </div>
+            <div>
+                <label for="cave_cols">COLS</label>
+                <input id="cave_cols" type="number" value="20" min="1" max="50" />
+            </div>
+            <div>
+                <label for="cave_chance">CHANCE %</label>
+                <input id="cave_chance" type="number" value="45" min="0" max="100" />
+            </div>
+            <div>
+                <label for="cave_interval">AUTO STEP MS</label>
+                <input id="cave_interval" type="number" value="250" min="1" max="5000" />
+            </div>
+            <div>
+                <label for="cave_birth">BIRTH</label>
+                <input id="cave_birth" type="number" value="4" min="0" max="7" />
+            </div>
+            <div>
+                <label for="cave_death">DEATH</label>
+                <input id="cave_death" type="number" value="3" min="0" max="7" />
+            </div>
+        </div>
+
+        <button id="generate_cave_button">GENERATE CAVE</button>
+
+        <div class="button-row">
+            <button id="cave_step_button">NEXT STEP</button>
+            <button id="cave_auto_button">AUTO RUN</button>
+        </div>
+        <button id="cave_stop_button">STOP</button>
+
+        <div class="status" id="status_text">Ready</div>
+    </div>
+</div>
+
+<script>
+    const mazeCanvas = document.getElementById("maze_canvas");
+    const mazeCtx = mazeCanvas.getContext("2d");
+
+    const caveCanvas = document.getElementById("cave_canvas");
+    const caveCtx = caveCanvas.getContext("2d");
+
+    const generateButton = document.getElementById("generate_button");
+    const solveButton = document.getElementById("solve_button");
+
+    const generateCaveButton = document.getElementById("generate_cave_button");
+    const caveStepButton = document.getElementById("cave_step_button");
+    const caveAutoButton = document.getElementById("cave_auto_button");
+    const caveStopButton = document.getElementById("cave_stop_button");
+
+    const statusText = document.getElementById("status_text");
+
+    let currentMaze = null;
+    let currentCave = null;
+    let currentMazeAnimationId = null;
+    let caveAutoTimer = null;
+
+    function updateMazeRanges(rows, cols) {
+        document.getElementById("start_row").max = rows - 1;
+        document.getElementById("start_col").max = cols - 1;
+        document.getElementById("finish_row").max = rows - 1;
+        document.getElementById("finish_col").max = cols - 1;
+
+        document.getElementById("finish_row").value = rows - 1;
+        document.getElementById("finish_col").value = cols - 1;
+    }
+
+    function drawMaze(data) {
+        const rows = data.rows;
+        const cols = data.cols;
+        const rightWalls = data.right_walls;
+        const bottomWalls = data.bottom_walls;
+
+        const cellWidth = 500 / cols;
+        const cellHeight = 500 / rows;
+
+        mazeCtx.clearRect(0, 0, 500, 500);
+        mazeCtx.fillStyle = "#30333b";
+        mazeCtx.fillRect(0, 0, 500, 500);
+
+        mazeCtx.strokeStyle = "#d8e1f0";
+        mazeCtx.lineWidth = 2;
+        mazeCtx.strokeRect(0, 0, 500, 500);
+
+        for (let i = 0; i < rows; ++i) {
+            for (let j = 0; j < cols; ++j) {
+                const x1 = j * cellWidth;
+                const y1 = i * cellHeight;
+                const x2 = (j + 1) * cellWidth;
+                const y2 = (i + 1) * cellHeight;
+
+                if (rightWalls[i][j] === 1) {
+                    mazeCtx.beginPath();
+                    mazeCtx.moveTo(x2, y1);
+                    mazeCtx.lineTo(x2, y2);
+                    mazeCtx.stroke();
+                }
+
+                if (bottomWalls[i][j] === 1) {
+                    mazeCtx.beginPath();
+                    mazeCtx.moveTo(x1, y2);
+                    mazeCtx.lineTo(x2, y2);
+                    mazeCtx.stroke();
+                }
+            }
+        }
+    }
+
+    function drawPathAnimated(path, rows, cols) {
+        if (!currentMaze || !path || path.length === 0) {
+            return;
+        }
+
+        if (currentMazeAnimationId !== null) {
+            cancelAnimationFrame(currentMazeAnimationId);
+            currentMazeAnimationId = null;
+        }
+
+        const cellWidth = 500 / cols;
+        const cellHeight = 500 / rows;
+
+        let visibleSegments = 0;
+
+        function render() {
+            drawMaze(currentMaze);
+
+            mazeCtx.strokeStyle = "#78a6ff";
+            mazeCtx.lineWidth = 2;
+            mazeCtx.lineCap = "round";
+            mazeCtx.lineJoin = "round";
+
+            const segmentsToDraw = Math.min(visibleSegments, path.length - 1);
+
+            if (segmentsToDraw > 0) {
+                mazeCtx.beginPath();
+
+                const firstX = path[0][1] * cellWidth + cellWidth / 2;
+                const firstY = path[0][0] * cellHeight + cellHeight / 2;
+                mazeCtx.moveTo(firstX, firstY);
+
+                for (let i = 1; i <= segmentsToDraw; ++i) {
+                    const x = path[i][1] * cellWidth + cellWidth / 2;
+                    const y = path[i][0] * cellHeight + cellHeight / 2;
+                    mazeCtx.lineTo(x, y);
+                }
+
+                mazeCtx.stroke();
+            }
+
+            if (segmentsToDraw < path.length - 1) {
+                visibleSegments += 1;
+                currentMazeAnimationId = requestAnimationFrame(render);
+            } else {
+                currentMazeAnimationId = null;
+            }
+        }
+
+        render();
+    }
+
+    function drawCave(data) {
+        const rows = data.rows;
+        const cols = data.cols;
+        const cells = data.cells;
+
+        caveCtx.clearRect(0, 0, 500, 500);
+        caveCtx.fillStyle = "#30333b";
+        caveCtx.fillRect(0, 0, 500, 500);
+
+        if (rows === 0 || cols === 0) {
+            return;
+        }
+
+        const cellWidth = 500 / cols;
+        const cellHeight = 500 / rows;
+
+        for (let i = 0; i < rows; ++i) {
+            for (let j = 0; j < cols; ++j) {
+                const x = j * cellWidth;
+                const y = i * cellHeight;
+                const w = cellWidth;
+                const h = cellHeight;
+
+                if (cells[i][j] === 1) {
+                    caveCtx.fillStyle = "#d8e1f0";
+                } else {
+                    caveCtx.fillStyle = "#30333b";
+                }
+
+                caveCtx.fillRect(x, y, w, h);
+
+                caveCtx.strokeStyle = "#4b5568";
+                caveCtx.lineWidth = 1;
+                caveCtx.strokeRect(x, y, w, h);
+            }
+        }
+
+        caveCtx.strokeStyle = "#d8e1f0";
+        caveCtx.lineWidth = 2;
+        caveCtx.strokeRect(0, 0, 500, 500);
+    }
+
+    async function caveStepRequest() {
+        const birth = document.getElementById("cave_birth").value;
+        const death = document.getElementById("cave_death").value;
+
+        const response = await fetch(`/cave/step?birth=${birth}&death=${death}`);
+        const data = await response.json();
+
+        currentCave = data;
+        drawCave(data);
+        return data;
+    }
+
+    generateButton.addEventListener("click", async () => {
+        const rows = document.getElementById("rows").value;
+        const cols = document.getElementById("cols").value;
+
+        const response = await fetch(`/generate?rows=${rows}&cols=${cols}`);
+        const data = await response.json();
+
+        currentMaze = data;
+        drawMaze(data);
+        updateMazeRanges(data.rows, data.cols);
+        statusText.textContent = `Generated maze ${data.rows} x ${data.cols}`;
+    });
+
+    solveButton.addEventListener("click", async () => {
+        if (!currentMaze) {
+            statusText.textContent = "Generate maze first";
+            return;
+        }
+
+        const startRow = document.getElementById("start_row").value;
+        const startCol = document.getElementById("start_col").value;
+        const finishRow = document.getElementById("finish_row").value;
+        const finishCol = document.getElementById("finish_col").value;
+
+        const response = await fetch(
+            `/solve?start_row=${startRow}&start_col=${startCol}&finish_row=${finishRow}&finish_col=${finishCol}`
+        );
+        const data = await response.json();
+
+        if (!data.path || data.path.length === 0) {
+            statusText.textContent = "Path not found";
+            drawMaze(currentMaze);
+            return;
+        }
+
+        statusText.textContent = `Maze path length: ${data.path.length}`;
+        drawPathAnimated(data.path, currentMaze.rows, currentMaze.cols);
+    });
+
+    generateCaveButton.addEventListener("click", async () => {
+        const rows = document.getElementById("cave_rows").value;
+        const cols = document.getElementById("cave_cols").value;
+        const chance = document.getElementById("cave_chance").value;
+        const birth = document.getElementById("cave_birth").value;
+        const death = document.getElementById("cave_death").value;
+
+        const response = await fetch(
+            `/cave/generate?rows=${rows}&cols=${cols}&chance=${chance}&birth=${birth}&death=${death}`
+        );
+        const data = await response.json();
+
+        currentCave = data;
+        drawCave(data);
+        statusText.textContent = `Generated cave ${data.rows} x ${data.cols}`;
+    });
+
+    caveStepButton.addEventListener("click", async () => {
+        if (!currentCave || currentCave.rows === 0) {
+            statusText.textContent = "Generate cave first";
+            return;
+        }
+
+        await caveStepRequest();
+        statusText.textContent = "Cave next step complete";
+    });
+
+    caveAutoButton.addEventListener("click", async () => {
+        if (!currentCave || currentCave.rows === 0) {
+            statusText.textContent = "Generate cave first";
+            return;
+        }
+
+        const interval = parseInt(document.getElementById("cave_interval").value, 10);
+
+        if (caveAutoTimer !== null) {
+            clearInterval(caveAutoTimer);
+            caveAutoTimer = null;
+        }
+
+        caveAutoTimer = setInterval(async () => {
+            await caveStepRequest();
+        }, interval);
+
+        statusText.textContent = `Cave auto run: ${interval} ms`;
+    });
+
+    caveStopButton.addEventListener("click", () => {
+        if (caveAutoTimer !== null) {
+            clearInterval(caveAutoTimer);
+            caveAutoTimer = null;
+        }
+
+        statusText.textContent = "Cave auto run stopped";
+    });
+</script>
+</body>
+</html>
