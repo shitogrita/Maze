@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include "../ml/MazeQSolver.h"
 #include "../core/maze.h"
+#include "../ml/MazeQSolver.h"
 
 inline bool AreAdjacentQ(const std::pair<int, int>& a,
                          const std::pair<int, int>& b) {
@@ -16,8 +16,7 @@ inline bool AreAdjacentQ(const std::pair<int, int>& a,
   return dr + dc == 1;
 }
 
-inline bool CanMoveQ(const s21::Maze& maze,
-                     const std::pair<int, int>& from,
+inline bool CanMoveQ(const s21::Maze& maze, const std::pair<int, int>& from,
                      const std::pair<int, int>& to) {
   const auto& right = maze.GetRightWalls();
   const auto& bottom = maze.GetBottomWalls();

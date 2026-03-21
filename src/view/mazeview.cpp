@@ -95,7 +95,8 @@ void MazeView::paintEvent(QPaintEvent* event) {
     path_pen.setWidth(4);
     painter.setPen(path_pen);
 
-    int draw_count = std::min(visible_path_size_, static_cast<int>(path_.size()));
+    int draw_count =
+        std::min(visible_path_size_, static_cast<int>(path_.size()));
 
     for (int i = 0; i + 1 < draw_count; ++i) {
       int row1 = path_[i].first;

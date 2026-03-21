@@ -210,7 +210,7 @@ dist:
 
 clang-format:
 	 @set -e; \
-	 find core parser render view test -type f \( \
+	 find core web ml view test -type f \( \
 	   -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" -o \
 	   -name "*.h" -o -name "*.hh" -o -name "*.hpp" -o -name "*.hxx" \
 	 \) -print0 | xargs -0 clang-format -i -style=Google

@@ -15,9 +15,7 @@ std::string MakeTempFileName(const std::string& name) {
   return "test_" + name + ".txt";
 }
 
-void RemoveFile(const std::string& path) {
-  std::remove(path.c_str());
-}
+void RemoveFile(const std::string& path) { std::remove(path.c_str()); }
 
 bool IsBinaryMatrix(const std::vector<std::vector<int>>& cells) {
   for (const auto& row : cells) {

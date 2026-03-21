@@ -1,13 +1,13 @@
-#include "crow.h"
-#include "../core/maze.h"
-#include "../core/cave.h"
-
 #include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "../core/cave.h"
+#include "../core/maze.h"
+#include "crow.h"
 
 namespace {
 s21::Maze current_maze;
@@ -90,9 +90,8 @@ std::string CaveToJson(const s21::Cave& cave) {
 int main() {
   crow::SimpleApp app;
 
-  CROW_ROUTE(app, "/")([]() {
-    return crow::response(ReadFile("web/index.html"));
-  });
+  CROW_ROUTE(app,
+             "/")([]() { return crow::response(ReadFile("web/index.html")); });
 
   CROW_ROUTE(app, "/generate")
   ([](const crow::request& req) {
@@ -133,8 +132,8 @@ int main() {
     const char* finish_row_param = req.url_params.get("finish_row");
     const char* finish_col_param = req.url_params.get("finish_col");
 
-    if (!start_row_param || !start_col_param ||
-        !finish_row_param || !finish_col_param) {
+    if (!start_row_param || !start_col_param || !finish_row_param ||
+        !finish_col_param) {
       return crow::response(400, "solve parameters are missing");
     }
 
@@ -143,8 +142,8 @@ int main() {
     int finish_row = std::stoi(finish_row_param);
     int finish_col = std::stoi(finish_col_param);
 
-    auto path = current_maze.Bfs({start_row, start_col},
-                                 {finish_row, finish_col});
+    auto path =
+        current_maze.Bfs({start_row, start_col}, {finish_row, finish_col});
 
     crow::response res;
     res.code = 200;
@@ -161,8 +160,8 @@ int main() {
     const char* birth_param = req.url_params.get("birth");
     const char* death_param = req.url_params.get("death");
 
-    if (!rows_param || !cols_param || !chance_param ||
-        !birth_param || !death_param) {
+    if (!rows_param || !cols_param || !chance_param || !birth_param ||
+        !death_param) {
       return crow::response(400, "cave parameters are missing");
     }
 

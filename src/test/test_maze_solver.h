@@ -17,8 +17,7 @@ bool AreAdjacent(const std::pair<int, int>& a, const std::pair<int, int>& b) {
   return dr + dc == 1;
 }
 
-bool CanMove(const s21::Maze& maze,
-             const std::pair<int, int>& from,
+bool CanMove(const s21::Maze& maze, const std::pair<int, int>& from,
              const std::pair<int, int>& to) {
   const auto& right = maze.GetRightWalls();
   const auto& bottom = maze.GetBottomWalls();

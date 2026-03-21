@@ -11,40 +11,40 @@
  * @brief Виджет для отображения лабиринта и пути.
  */
 class MazeView : public QWidget {
-	Q_OBJECT
+  Q_OBJECT
 
-   public:
-	/**
-	 * @brief Конструктор виджета.
-	 */
-	explicit MazeView(QWidget* parent = nullptr);
+ public:
+  /**
+   * @brief Конструктор виджета.
+   */
+  explicit MazeView(QWidget* parent = nullptr);
 
-	/**
-	 * @brief Устанавливает лабиринт для отображения.
-	 */
-	void SetMaze(const s21::Maze& maze);
+  /**
+   * @brief Устанавливает лабиринт для отображения.
+   */
+  void SetMaze(const s21::Maze& maze);
 
-	/**
-	 * @brief Устанавливает путь для отображения.
-	 */
-	void SetPath(const std::vector<std::pair<int, int>>& path);
+  /**
+   * @brief Устанавливает путь для отображения.
+   */
+  void SetPath(const std::vector<std::pair<int, int>>& path);
 
-protected:
-	/**
-	 * @brief Отрисовывает лабиринт и путь.
-	 */
-	void paintEvent(QPaintEvent* event) override;
+ protected:
+  /**
+   * @brief Отрисовывает лабиринт и путь.
+   */
+  void paintEvent(QPaintEvent* event) override;
 
-private slots:
-	/**
-	 * @brief Выполняет следующий шаг анимации пути.
-	 */
-	void OnPathAnimationStep();
+ private slots:
+  /**
+   * @brief Выполняет следующий шаг анимации пути.
+   */
+  void OnPathAnimationStep();
 
-private:
-	s21::Maze maze_;
+ private:
+  s21::Maze maze_;
 
-	std::vector<std::pair<int, int>> path_;
-	int visible_path_size_ = 0;
-	QTimer* path_timer_ = nullptr;
+  std::vector<std::pair<int, int>> path_;
+  int visible_path_size_ = 0;
+  QTimer* path_timer_ = nullptr;
 };
